@@ -1,7 +1,10 @@
 package com.br.senai.bibliotecajpa.entidade;
 
 import jakarta.persistence.*;
-
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -13,40 +16,54 @@ public class Livro {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    @Column(name = "titulo", nullable = false, length = 100)
+    @NotBlank(message = "O título é obrigatório.")
+    @Size(max = 100, message = "O título deve ter no máximo 100 caracteres.")
+    @Column(nullable = false, length = 100)
     private String titulo;
 
-    @Column(name = "autor", nullable = false, length = 100)
+    @NotBlank(message = "O autor é obrigatório.")
+    @Size(max = 100, message = "O autor deve ter no máximo 100 caracteres.")
+    @Column(nullable = false, length = 100)
     private String autor;
 
-    @Column
+    @NotNull(message = "O ano de publicação é obrigatório.")
+    @Column(name = "ano_publicacao", nullable = false)
     private Integer anoPublicacao;
 
-    @Column
+    @NotNull(message = "A quantidade disponível é obrigatória.")
+    @Column(name = "quantidade_disponivel", nullable = false)
     private Integer quantidadeDisponivel;
 
-    @Column
+    @PastOrPresent(message = "A data de cadastro não pode estar no futuro.")
+    @Column(name = "data_cadastro")
     private LocalDate dataCadastro;
 
-    @Column
+    @NotBlank(message = "O ISBN é obrigatório.")
+    @Size(max = 13, message = "O ISBN deve ter no máximo 13 caracteres.")
+    @Column(nullable = false, unique = true, length = 13)
     private String isbn;
 
-    @Column
+    @NotBlank(message = "A editora é obrigatória.")
+    @Size(max = 255, message = "A editora deve ter no máximo 255 caracteres.")
+    @Column(nullable = false, length = 255)
     private String editora;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "categoria_id")
     private Categoria categoria;
 
     public Livro() {
     }
 
-    public Livro(Integer id, String titulo, String autor, Integer anoPublicacao, Integer quantidadeDisponivel, LocalDate dataCadastro) {
+    public Livro(Integer id, String titulo, String autor, Integer anoPublicacao, Integer quantidadeDisponivel, LocalDate dataCadastro, String isbn, String editora) {
         this.id = id;
         this.titulo = titulo;
         this.autor = autor;
         this.anoPublicacao = anoPublicacao;
         this.quantidadeDisponivel = quantidadeDisponivel;
         this.dataCadastro = dataCadastro;
+        this.isbn = isbn;
+        this.editora = editora;
     }
 
     public Integer getId() {
@@ -126,12 +143,19 @@ public class Livro {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Livro livro = (Livro) o;
-        return Objects.equals(id, livro.id) && Objects.equals(titulo, livro.titulo) && Objects.equals(autor, livro.autor) && Objects.equals(anoPublicacao, livro.anoPublicacao) && Objects.equals(quantidadeDisponivel, livro.quantidadeDisponivel) && Objects.equals(dataCadastro, livro.dataCadastro);
+        return Objects.equals(id, livro.id) &&
+               Objects.equals(titulo, livro.titulo) &&
+               Objects.equals(autor, livro.autor) &&
+               Objects.equals(anoPublicacao, livro.anoPublicacao) &&
+               Objects.equals(quantidadeDisponivel, livro.quantidadeDisponivel) &&
+               Objects.equals(dataCadastro, livro.dataCadastro) &&
+               Objects.equals(isbn, livro.isbn) &&
+               Objects.equals(editora, livro.editora);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, titulo, autor, anoPublicacao, quantidadeDisponivel, dataCadastro);
+        return Objects.hash(id, titulo, autor, anoPublicacao, quantidadeDisponivel, dataCadastro, isbn, editora);
     }
 
     @Override
@@ -143,6 +167,9 @@ public class Livro {
                 ", anoPublicacao=" + anoPublicacao +
                 ", quantidadeDisponivel=" + quantidadeDisponivel +
                 ", dataCadastro=" + dataCadastro +
+                ", isbn='" + isbn + '\'' +
+                ", editora='" + editora + '\'' +
+                ", categoria=" + categoria +
                 '}';
     }
 }
